@@ -1,0 +1,18 @@
+[[entries]]
+title = "info"
+
+[[entries.entries]]
+title = "a blog for my computer and electronics stuff, some discoveries and fiddling around with tech"
+
+[[entries]]
+title = "posts"
+
+[entries.post_list]
+limit = 5
+show_more = true
+show_more_text = "See more..."
+show_more_url = "posts"
+
+[[entries]]
+title = "rss"
+url = "index.xml"

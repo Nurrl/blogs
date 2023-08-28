@@ -1,4 +1,10 @@
-title = 'unw!re'
-baseURL = 'https://unw.re/'
-languageCode = 'en-us'
-theme = 'terminal'
+baseURL = "https://unw.re/" # if your site is in 'https', then make sure your base url isn't written using 'http' otherwise your sitemap would contain http (as opposeed to https) URLs. This would affect Google indexing of your URLs.
+title = "unw!re"
+paginate = 5
+theme = "nostyleplease"
+
+enableInlineShortcodes = true
+enableRobotsTXT = true
+
+[markup.highlight]
+style = "modus-vivendi"
