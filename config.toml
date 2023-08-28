@@ -1,0 +1,4 @@
+title = 'unw!re'
+baseURL = 'https://unw.re/'
+languageCode = 'en-us'
+theme = 'terminal'
