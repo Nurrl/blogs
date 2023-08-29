@@ -107,11 +107,11 @@ td {
 }
 
 pre {
-  margin: 8px;
   border-radius: 6px;
   overflow-x: auto;
 }
 
+/* for inline code */
 code {
   display: inline-block;
   font-size: 90%;
@@ -119,6 +119,20 @@ code {
 
   padding: 0 4px;
   border-radius: 6px;
+}
+
+/* for code blocks */
+pre>code {
+  display: block;
+}
+
+/* for code blocks without line numbers */
+:not(td)>pre {
+  margin: 0;
+}
+
+:not(td)>pre>code {
+  padding: 16px;
 }
 
 blockquote {
