@@ -107,15 +107,18 @@ td {
 }
 
 pre {
-  margin: 0;
+  margin: 8px;
   border-radius: 6px;
   overflow-x: auto;
 }
 
 code {
   display: inline-block;
-  margin: 8px;
   font-size: 90%;
+  background-color: var(--bg-accent-color);
+
+  padding: 0 4px;
+  border-radius: 6px;
 }
 
 blockquote {
