@@ -33,13 +33,14 @@ The configuration requires a specific piece of software called Cisco Unified Com
 At this point I felt betrayed, I had a fully functionning device in my hands, without any mean of configuring it.
 As dumb as this might sound, you cannot set the device up, _or can you ? :)_
 
-### Looking into the firmware files
+### Unwrapping the update files
 
-The ATA 190's firmware comes in two different flavors that are essentially the same, but bundles differently, a `.k3.cop.sgn` file that is signed and contains the other format, a `.zip` file containing itself a binary signed file as well, they both are supposed to be processed by CUCM before updating the device, but we can manually unpack them.
+The ATA 190's updates bundles come in two different flavors that are essentially the same, a `.k3.cop.sgn` file that is signed and contains the other format, an archive (`.zip` or `.tar.gz`) file containing a signed binary file as well.
+They both are supposed to be processed by CUCM before updating the device, however we can manually unpack them if we fiddle around.
 
----
+Here we will only explore the archive (`.zip` file in this case) as it involves less unpacking and binary modifications to obtain a firmware file processable by the ATA.
 
-Here we will only explore the `.zip` file as it involves less unpacking and binary modifications to obtain a firmware file processable by the ATA.
+Once we downloaded the bundle, we can extract the archive in the current directory using `unzip` as such:
 
 {{<highlight sh>}}
 $> unzip -d . cmterm-ata190.1-2-2-003_SR2-1.zip
@@ -48,7 +49,7 @@ Archive:  cmterm-ata190.1-2-2-003_SR2-1.zip
   inflating: ./ATA190.1-2-2-003_SR2-1.loads
 {{</highlight>}}
 
-After unpacking the `.zip` and discarding the `.loads` file as it is only used by Cisco's software, we get our hands on this `.bin.sgn` that is the firmware file, with a signature header, that we'll remove right away.
+After discarding the `.loads` file as it is only used by Cisco's software, we get our hands on the `.bin.sgn` firmware file, with a signature header, that we'll remove right away.
 
 For this, we use the `grep` utility to get the index of the beginning of the firmware blob.
 
@@ -74,9 +75,9 @@ $> xxd ATA190.1-2-2-003_SR2-1.bin | head -2
 00000010: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 {{</highlight>}}
 
-Now that we're left with an unsigned firmware blob (_isn't it a cute blob ?_) that is processable by the ATA, we can investigate further into it's content.
+### Diving into the firmware
 
----
+Now that we're left with an unsigned firmware blob (_isn't it a cute blob ?_) that is processable by the ATA, we can investigate further into it's content.
 
 ### Investigating the web interface
 
