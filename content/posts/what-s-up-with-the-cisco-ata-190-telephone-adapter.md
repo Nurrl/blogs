@@ -79,12 +79,102 @@ $> xxd ATA190.1-2-2-003_SR2-1.bin | head -2
 
 Now that we're left with an unsigned firmware blob (_isn't it a cute blob ?_) that is processable by the ATA, we can investigate further into it's content.
 
+A quick and dirty way of doing this is by using the `strings` command, this will reveal us some of the ASCII strings contained in the binary file. Here we search for some of the web interface files in example.
+
+{{<highlight sh>}}
+# Most of the output is truncated, but these look like
+# interesting pages to look at later
+$> strings ATA190.1-2-2-003_SR2-1.bin | grep -e .asp -e .cgi
+# ...
+Backup.asp
+Diagnostics2.asp
+Diagnostics_tab1.asp
+Diagnostics_tab2.asp
+Factory_Defaults.asp
+Factory_Defaults_run.asp
+Management.asp
+Management2.asp
+Management_u.asp
+Reboot.asp
+Reset_button.aspbH
+Restore.asp
+Upgrade.aspbM
+Upgrade_run.asp
+port_setting.aspVC
+privilegectl.asp
+quick_setup.asp
+quicksetup.asp
+# ...
+{{</highlight>}}
+
+A more efficient way to unpack the firmware's content is to use `binwalk`[^4]. It's an utility able to find start and end markers of some known formats in a binary file and extract them.
+
+{{<highlight sh>}}
+$> binwalk --extract ATA190.1-2-2-003_SR2-1.bin
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+388           0x184           uImage header, header size: 64 bytes, header CRC: 0xE7981D4B, created: 2106-02-07 06:28:15, image size: 1572736 bytes, Data Address: 0x20008000, Entry Point: 0x20008000, data CRC: 0xF84AC86, OS: Linux, CPU: ARM, image type: OS Kernel Image, compression type: none, image name: "SP2Xcybertan_rom_bin"
+452           0x1C4           Linux kernel ARM boot executable zImage (little-endian)
+13592         0x3518          gzip compressed data, maximum compression, from Unix, last modified: 2020-09-07 07:07:53
+1573188       0x180144        uImage header, header size: 64 bytes, header CRC: 0x1628277F, created: 2106-02-07 06:28:15, image size: 8998912 bytes, Data Address: 0x0, Entry Point: 0x0, data CRC: 0x7607965A, OS: Linux, CPU: ARM, image type: Filesystem Image, compression type: none, image name: "SP2Xcybertan_rom_bin"
+
+WARNING: Extractor.execute failed to run external extractor 'unsquashfs -d 'squashfs-root' '%e'': [Errno 2] No such file or directory: 'unsquashfs', 'unsquashfs -d 'squashfs-root' '%e'' might not be installed correctly
+
+WARNING: Extractor.execute failed to run external extractor 'sasquatch -p 1 -le -d 'squashfs-root' '%e'': [Errno 2] No such file or directory: 'sasquatch', 'sasquatch -p 1 -le -d 'squashfs-root' '%e'' might not be installed correctly
+
+WARNING: Extractor.execute failed to run external extractor 'sasquatch -p 1 -be -d 'squashfs-root' '%e'': [Errno 2] No such file or directory: 'sasquatch', 'sasquatch -p 1 -be -d 'squashfs-root' '%e'' might not be installed correctly
+1573252       0x180184        Squashfs filesystem, little endian, non-standard signature, version 3.1, size: 8998794 bytes, 1044 inodes, blocksize: 131072 bytes, created: 2020-09-07 23:51:21
+{{</highlight>}}
+
+Moving on to the destination directory's content, we mainly have a `.squashfs` file containing the firmware's root filesystem. While `unsquashfs` won't be able to unpack this for _unknown reasons_, `7z` seems to be able to handle this job just fine.
+
+{{<highlight sh>}}
+$> 7z -osquashfs-root x _ATA190.1-2-2-003_SR2-1.bin.extracted/180184.squashfs
+
+7-Zip (z) 23.01 (x64) : Copyright (c) 1999-2023 Igor Pavlov : 2023-06-20
+ 64-bit locale=C.UTF-8 Threads:4 OPEN_MAX:1024
+
+Scanning the drive for archives:
+1 file, 8998794 bytes (8788 KiB)
+
+Extracting archive: _ATA190.1-2-2-003_SR2-1.bin.extracted/180184.squashfs
+--
+Path = _ATA190.1-2-2-003_SR2-1.bin.extracted/180184.squashfs
+Type = SquashFS
+Physical Size = 8998794
+Headers Size = 55391
+File System = SquashFS-LZMA 3.1
+Method = LZMA ZLIB
+Cluster Size = 131072
+Big-endian = -
+Created = 2020-09-08 01:51:21
+Characteristics = UNCOMPRESSED_INODES CHECK DUPLICATES_REMOVED EXPORTABLE
+Code Page = UTF-8
+# ... (stripped out some complaints about insecure symlinks)
+{{</highlight>}}
+
+The `squashfs-root` directory is now populated with the ATA's root filesystem content. _Hooray !_
+
+#### Some random discoveries made during the filesystem exploration
+
+- There is a directory located at `/www/spa100_help` containing documentation the **Cisco SPA100** series ATAs, _could this be a repurpose of the firmware, of the hardware ?_
+- The files doing actual changes on the configuration of the device are directly bundled in the web server binary (`/usr/sbin/httpd`), making any further research on how to configure the device by attacking the web interface way more complicated.
+- There are many leftover files not referenced in the web interface, but totally accessible knowing their path, _more on that later_.
+- Some files make reference to a **nvram**(_non-volatile memory_), this is probably the place where the configuration is stored.
+- The firmware update routine in the web interface checks for the exact string `ATA190  FiRmWaRe` before allowing the upgrade, but also contains checks for some other models like `SPA112` & `SPA122`.
+
 ### Investigating the web interface
 
+
+
 ### Accessing the serial console
+
+> This section is based on the works made in the following article: https://www.insentricity.com/a.cl/277/unlocking-a-cisco-spa122-for-use-with-any-provider.
 
 ## Reviving the beast
 
 [^1]: an **A**nalog **T**elephone **A**dapter is a devices that enables the use of analog telephones (or anything that uses a landline) on **V**oice **o**ver **I**nternet **P**rotocol phone systems.
 [^2]: **S**ession **I**nitiation **P**rotocol is a popular protocol used for VoIP communications around the world, see [RFC2543](https://datatracker.ietf.org/doc/html/rfc2543).
 [^3]: a **T**rivial **F**ile **T**ransfer **P**rotocol server is a piece of software that allows storing and retrieving files from the network in a technically simple way, see [RFC1350](https://datatracker.ietf.org/doc/html/rfc1350).
+[^4]: see https://github.com/ReFirmLabs/binwalk.
