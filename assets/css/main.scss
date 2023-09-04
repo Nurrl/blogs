@@ -1,10 +1,13 @@
 :root {
-  --bg-color: #fff;
-  --bg-accent-color: #282a36;
+  --bg-color: #ffffff;
+  --bg-accent-color: #001021;
+  --bg-accent-color: #ffefde;
 
-  --text-color: #000;
+  --text-color: #000000;
+  --text-accent-color: #eeeeee;
+  --text-accent-color: #101010;
 
-  --highlight-color: #ff0000;
+  --highlight-color: #d6d8b3;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -12,9 +15,10 @@
     --bg-color: #1b2021;
     --bg-accent-color: #001021;
 
-    --text-color: #EEEEEE;
+    --text-color: #eeeeee;
+    --text-accent-color: #eeeeee;
 
-    --highlight-color: #29274C;
+    --highlight-color: #29274c;
   }
 }
 
@@ -87,8 +91,6 @@ hr {
   }
 }
 
-
-
 table {
   width: 100%;
 }
@@ -107,8 +109,8 @@ td {
 }
 
 pre {
-  border-radius: 6px;
   overflow-x: auto;
+  border-radius: 6px;
 }
 
 /* for inline code */
@@ -116,22 +118,27 @@ code {
   display: inline-block;
   font-size: 90%;
   background-color: var(--bg-accent-color);
+  color: var(--text-accent-color);
 
   padding: 0 4px;
   border-radius: 6px;
 }
 
 /* for code blocks */
-pre>code {
+.highlight pre {
+  background-color: var(--bg-accent-color) !important;
+}
+
+pre code {
   display: block;
 }
 
 /* for code blocks without line numbers */
-:not(td)>pre {
+:not(td) pre {
   margin: 0;
 }
 
-:not(td)>pre>code {
+:not(td) pre code {
   padding: 16px;
 }
 
