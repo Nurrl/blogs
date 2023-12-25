@@ -162,7 +162,7 @@ The `squashfs-root` directory is now populated with the ATA's root filesystem co
 - The files doing actual changes on the configuration of the device are directly bundled in the web server binary (`/usr/sbin/httpd`), making any further research on how to configure the device by attacking the web interface way more complicated.
 - There are many leftover files not referenced in the web interface, but totally accessible knowing their path, _more on that later_.
 - Some files make reference to a **nvram**(_non-volatile memory_), this is probably the place where the configuration is stored.
-- The firmware update routine in the web interface checks for the exact string `ATA190  FiRmWaRe` before allowing the upgrade, but also contains checks for some other models like `SPA112` & `SPA122`.
+- The firmware update routine in the web interface checks for the exact string `ATA190  FiRmWaRe` before allowing the upgrade, but also contains checks for some other models like **SPA112** & **SPA122**.
 
 ### Investigating the web interface
 
