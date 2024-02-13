@@ -9,3 +9,6 @@ enableRobotsTXT = true
 
 [markup.highlight]
 style = "modus-vivendi"
+
+[markup.goldmark.renderer]
+unsafe = true
