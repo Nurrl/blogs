@@ -37,6 +37,10 @@ body {
   overflow-wrap: break-word;
 }
 
+.center {
+  text-align: center;
+}
+
 .post-meta {
   text-align: right;
 }
@@ -116,12 +120,14 @@ pre {
 /* for inline code */
 code {
   display: inline-block;
+  text-align: left;
   font-size: 90%;
   background-color: var(--bg-accent-color);
   color: var(--text-accent-color);
 
   padding: 0 4px;
   margin: 0 -4px;
+
   border-radius: 6px;
 }
 
@@ -130,17 +136,14 @@ code {
   background-color: var(--bg-accent-color) !important;
 }
 
-pre code {
-  display: block;
-}
-
 /* for code blocks without line numbers */
 :not(td) pre {
   margin: 0;
 }
 
 :not(td) pre code {
-  padding: 16px;
+  margin: 0;
+  padding: 12px;
 }
 
 blockquote {
