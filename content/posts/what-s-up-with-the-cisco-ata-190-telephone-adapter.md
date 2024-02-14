@@ -5,7 +5,7 @@ draft: false
 toc: true
 ---
 
-There are times we start new projects and end up choosing some vendors, because they are industry standards, are well known and recognized, and some of those times, we end up having in our hands some pretty neat hardware with the capabilities we were searching for, just to notice that the software they come with are designed to get in the way of any potential use of the system outside of an enterprise network and a designated set of infrastructures.
+There are times we start new projects and end up choosing some vendors, because they are industry standards, are well known and recognized, and some of those times, we end up having in our hands some pretty neat hardware with the capabilities we were searching for, just to notice that the software they come with are designed to get in the way of any potential use of the system outside of an enterprise network and/or a designated infrastructure.
 
 That was the case when I got my hands on the _infuriating_ **Cisco ATA[^1] 190** for ~35€ secondhand on the internet.
 
@@ -167,10 +167,34 @@ The `squashfs-root` directory is now populated with the ATA's root filesystem co
 ### Investigating the web interface
 
 
-
 ### Accessing the serial console
 
 > This section is based on the works made in the following article: https://www.insentricity.com/a.cl/277/unlocking-a-cisco-spa122-for-use-with-any-provider.
+
+So a thing I noticed reading the article from _insentricity.com_ and opening my **ATA190**, is that _the hardware seems to be fairly similar_.
+
+The post describe pinout from the **J2** header on the board, which is a standard 3.3v UART interface.
+
+{{% center %}}
+
+```
+VCC RX TX GND
+ \  |  /  |
+  | | |   |
+[ ○ ○ ○   ○ ]
+  1       5
+```
+
+{{% /center %}}
+
+> **Figure 3.** Schematic view of the UART(**J2**) header
+
+Hooking a UART-to-USB interface to the pins (_RX-to-TX_ and _TX-to-RX_, plus GND), we can connect to the serial console at **115200 bauds**.
+{{<highlight sh>}}
+# `<device>` is the device file of your serial interface,
+# in my case it is `ttyUSB0`
+$> cu -l /dev/<device> -s 115200
+{{</highlight>}}
 
 ## Reviving the beast
 
